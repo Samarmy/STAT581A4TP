@@ -1,0 +1,88 @@
+---
+title: "STAT-581A4 Final Project"
+author: "Sam Armstrong"
+date: "12/8/2019"
+output: pdf_document
+---
+
+```{r}
+library(xlsx)
+library(ggplot2)
+library(heplots,warn.conflicts=FALSE,quietly = T)
+library(ggbiplot,warn.conflicts=FALSE,quietly=TRUE)
+library(psych,warn.conflicts=FALSE,quietly=TRUE)
+```
+
+```{r}
+AAPL_data <- read.xlsx(file="/s/chopin/k/grad/sarmst/stat581A4/AAPL.xlsx", 1)
+MSFT_data <- read.xlsx(file="/s/chopin/k/grad/sarmst/stat581A4/MSFT.xlsx", 1)
+```
+
+```{r}
+round(colMeans(AAPL_data[, 2:6]), 2)
+```
+
+```{r}
+round(colMeans(MSFT_data[, 2:6]), 2)
+```
+
+```{r}
+round(apply(AAPL_data[, 2:6], 2, sd, na.rm = TRUE), 2)
+```
+```{r}
+round(apply(MSFT_data[, 2:6], 2, sd, na.rm = TRUE), 2)
+```
+
+```{r}
+round(cov(AAPL_data[, 2:6]), 4)
+round(cov(MSFT_data[, 2:6]), 4)
+```
+
+```{r}
+round(cor(AAPL_data[, 2:6]), 4)
+round(cor(MSFT_data[, 2:6]), 4)
+```
+```{r}
+pairs(AAPL_data[, 2:6])
+pairs(MSFT_data[, 2:6])
+```
+
+```{r}
+AAPL_temp = cbind(AAPL_data[, 2:6], matrix(rep(1,each=1259),nrow=1259))
+MSFT_temp = cbind(MSFT_data[, 2:6], matrix(rep(2,each=1259),nrow=1259))
+colnames(AAPL_temp)<-c('Close', 'Open', 'High', 'Low', 'Volume', 'Stock')
+colnames(MSFT_temp)<-c('Close', 'Open', 'High', 'Low', 'Volume', 'Stock')
+stock_data = rbind(AAPL_temp, MSFT_temp);
+head(stock_data)
+```
+```{r}
+summary(manova(as.matrix(stock_data[, 1:5])~as.factor(stock_data[, 6])),test="Wilks")
+```
+
+```{r}
+boxM(as.matrix(stock_data[, 1:5]),as.factor(stock_data[, 6]))
+```
+
+```{r}
+cortest.mat(cor(AAPL_data[, 2:6]), cor(MSFT_data[, 2:6])) 
+```
+
+
+
+```{r}
+AAPL.pc=princomp(AAPL_data[, 2:6],cor=TRUE)
+summary(AAPL.pc,loadings=T)
+ggbiplot(AAPL.pc)
+MSFT.pc=princomp(MSFT_data[, 2:6],cor=TRUE)
+summary(MSFT.pc,loadings=T)
+ggbiplot(MSFT.pc)
+```
+
+```{r}
+AAPL.fa<-principal(AAPL_data[, 2:6],nfactors=2,rotate="varimax")
+AAPL.fa$loadings
+biplot(AAPL.fa)
+MSFT.fa<-principal(MSFT_data[, 2:6],nfactors=2,rotate="varimax")
+MSFT.fa$loadings
+biplot(MSFT.fa)
+```
